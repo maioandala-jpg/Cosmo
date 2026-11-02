@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1020">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Cosmo">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Cosmo · ANDALA</title>
+<style>
+:root{--bg:#0b1020;--card:rgba(255,255,255,.07);--line:rgba(255,255,255,.12);--txt:#f4f6ff;--mut:#a9b0d0;
+  --a:#ff5fa2;--b:#7c5cff;--c:#22d3ee;--d:#ffd166;--g:linear-gradient(135deg,#ff5fa2,#7c5cff 55%,#22d3ee)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  display:flex;flex-direction:column;overflow:hidden;position:relative}
+body::before,body::after{content:"";position:fixed;width:340px;height:340px;border-radius:50%;filter:blur(90px);opacity:.45;z-index:0;animation:drift 16s ease-in-out infinite alternate}
+body::before{background:var(--b);top:-100px;left:-80px}
+body::after{background:var(--a);bottom:-120px;right:-90px;animation-delay:-8s}
+@keyframes drift{to{transform:translate(60px,50px) scale(1.2)}}
+.star{position:fixed;width:2px;height:2px;border-radius:50%;background:#fff;z-index:0;animation:tw 4s infinite}
+@keyframes tw{50%{opacity:.1;transform:scale(.4)}}
+header,main,nav{position:relative;z-index:1}
+header{display:flex;justify-content:space-between;align-items:center;padding:calc(14px + env(safe-area-inset-top)) 20px 6px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.22em;font-size:14px}
+.logo i{width:26px;height:26px;border-radius:8px;background:var(--g);display:block;box-shadow:0 0 18px rgba(124,92,255,.7)}
+.logo small{display:block;font-size:9px;letter-spacing:.18em;color:var(--mut);font-weight:600;margin-top:1px}
+.ib{background:var(--card);border:1px solid var(--line);color:var(--txt);width:40px;height:40px;border-radius:12px;font-size:17px;cursor:pointer}
+main{flex:1;overflow-y:auto;padding:6px 18px 12px;display:flex;flex-direction:column}
+.view{display:none;flex-direction:column;align-items:center;flex:1}
+.view.on{display:flex}
+h1{font-size:24px;font-weight:700;margin-top:4px;text-align:center}
+.sub{color:var(--mut);font-size:13px;margin-top:3px;text-align:center}
+.orb{width:150px;height:150px;border-radius:50%;margin:24px 0 12px;position:relative;flex:none;
+  background:radial-gradient(circle at 32% 28%,#fff 0,var(--c) 28%,var(--b) 62%,var(--a) 100%);
+  box-shadow:0 0 40px var(--b),0 0 100px rgba(255,95,162,.45);animation:float 4s ease-in-out infinite;transition:box-shadow .3s}
+.orb::before,.orb::after{content:"";position:absolute;inset:-12px;border-radius:50%;border:1.5px solid rgba(255,255,255,.3);animation:ring 2.6s infinite}
+.orb::after{animation-delay:1.3s}
+@keyframes ring{from{transform:scale(.92);opacity:.8}to{transform:scale(1.4);opacity:0}}
+@keyframes float{50%{transform:translateY(-10px)}}
+.orb.listen{animation:pulse .8s ease-in-out infinite;box-shadow:0 0 50px var(--c),0 0 120px var(--c)}
+.orb.speak{animation:pulse .45s ease-in-out infinite;box-shadow:0 0 50px var(--d),0 0 120px var(--a)}
+@keyframes pulse{50%{transform:scale(1.09)}}
+.eyes{position:absolute;top:41%;left:0;right:0;display:flex;justify-content:center;gap:30px}
+.eyes i{width:12px;height:20px;background:#120a33;border-radius:50%;animation:blink 5s infinite}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+.pill{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--mut);background:var(--card);border:1px solid var(--line);padding:6px 12px;border-radius:99px}
+.dot{width:8px;height:8px;border-radius:50%;background:#666}
+.pill.live .dot{background:#34d399;box-shadow:0 0 8px #34d399;animation:tw 1.4s infinite}
+#log{width:100%;display:flex;flex-direction:column;gap:8px;margin:14px 0 6px;max-height:30vh;overflow-y:auto;min-height:60px}
+.m{padding:10px 14px;border-radius:16px;font-size:14.5px;line-height:1.4;max-width:88%;animation:pop .25s}
+@keyframes pop{from{transform:translateY(8px);opacity:0}}
+.m.c{background:var(--card);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:5px}
+.m.u{background:var(--g);align-self:flex-end;border-bottom-right-radius:5px}
+.mic{width:76px;height:76px;border-radius:50%;border:0;font-size:30px;color:#fff;cursor:pointer;margin:8px 0;flex:none;
+  background:var(--g);box-shadow:0 10px 34px rgba(124,92,255,.55)}
+.mic:active{transform:scale(.94)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:8px}
+.chip{background:var(--card);border:1px solid var(--line);color:var(--txt);padding:7px 12px;border-radius:99px;font-size:12px;cursor:pointer}
+.row{width:100%;display:flex;gap:8px}
+.row input{flex:1;padding:13px 16px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:15px;outline:0}
+.row input:focus{border-color:var(--b)}
+.btn{border:0;border-radius:14px;padding:0 18px;font-size:15px;font-weight:600;color:#fff;background:var(--g);cursor:pointer;min-height:46px}
+.btn.alt{background:var(--card);border:1px solid var(--line)}
+.card{width:100%;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-top:12px}
+.card h3{font-size:14px;margin-bottom:10px}
+.timeinp{width:100%;font-size:38px;font-weight:700;text-align:center;background:transparent;color:var(--txt);border:0;outline:0;color-scheme:dark}
+.al{display:flex;align-items:center;gap:12px;padding:12px 4px;border-top:1px solid var(--line)}
+.al:first-child{border-top:0}
+.al .t{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums}
+.al .l{font-size:12px;color:var(--mut)}
+.al .sp{flex:1}
+.sw{position:relative;width:46px;height:26px;flex:none}
+.sw input{opacity:0;width:100%;height:100%;position:absolute;inset:0;z-index:2;cursor:pointer}
+.sw span{position:absolute;inset:0;border-radius:99px;background:#3a4062;transition:.2s}
+.sw span::after{content:"";position:absolute;width:20px;height:20px;top:3px;left:3px;border-radius:50%;background:#fff;transition:.2s}
+.sw input:checked+span{background:var(--b)}
+.sw input:checked+span::after{transform:translateX(20px)}
+.x{background:none;border:0;color:var(--mut);font-size:18px;cursor:pointer;padding:6px}
+.note{font-size:12px;color:var(--mut);line-height:1.5;margin-top:10px}
+nav{display:flex;padding:8px 14px calc(8px + env(safe-area-inset-bottom));background:rgba(11,16,32,.85);border-top:1px solid var(--line);backdrop-filter:blur(14px)}
+nav button{flex:1;background:none;border:0;color:var(--mut);padding:8px;font-size:11px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}
+nav button b{font-size:20px;font-weight:400}
+nav button.on{color:#fff}
+nav button.on b{filter:drop-shadow(0 0 8px var(--b))}
+footer{text-align:center;font-size:11px;color:var(--mut);padding:10px 0 2px}
+footer b{color:var(--d);letter-spacing:.16em}
+dialog{border:1px solid var(--line);border-radius:20px;padding:20px;width:min(92vw,420px);background:#141a36;color:var(--txt);margin:auto}
+dialog::backdrop{background:rgba(0,0,0,.65)}
+dialog label{display:block;font-size:12px;color:var(--mut);margin:12px 0 4px}
+dialog input[type=text],dialog input[type=password]{width:100%;padding:11px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:15px}
+#ring{position:fixed;inset:0;z-index:50;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:30px;
+  background:radial-gradient(circle,#3b1a7a,#0b1020 70%);animation:bgp 1s infinite alternate}
+@keyframes bgp{to{filter:hue-rotate(40deg)}}
+#ring.on{display:flex}
+#ring .big{font-size:64px;font-weight:800}
+#ring .btn{padding:16px 40px;font-size:18px}
+.confetti{position:fixed;top:-12px;width:9px;height:14px;z-index:60;animation:fall 2.6s linear forwards;pointer-events:none}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+
+/* --- versão APK: ecrã limpo --- */
+.sub,.chips,footer,.note,#alist-card .note{display:none!important}
+#lock{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:30px;text-align:center;background:radial-gradient(circle at 50% 30%,#2a1560,#0b1020 70%)}
+#lock.off{display:none}
+#lock h2{font-size:22px}#lock p{font-size:13px;color:var(--mut);min-height:18px}
+#lock input{width:100%;max-width:300px;padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:18px;text-align:center;outline:0}
+#lock .btn{width:100%;max-width:300px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo"><i></i><div>COSMO<small>BY ANDALA</small></div></div>
+  <button class="ib" id="gear" aria-label="Definições">⚙</button>
+</header>
+
+<main>
+  <section class="view on" id="v-home">
+    <h1 id="hello">Olá, senhor Isaías</h1>
+    <p class="sub">Assistente de voz pessoal</p>
+    <div class="orb" id="orb"><div class="eyes"><i></i><i></i></div></div>
+    <div class="pill" id="pill"><span class="dot"></span><span id="status">Pronto</span></div>
+    <div id="log"></div>
+    <button class="mic" id="mic" aria-label="Falar">🎤</button>
+    <div class="chips">
+      <button class="chip">Que horas são?</button>
+      <button class="chip">Acorda-me às 6 e 30</button>
+      <button class="chip">Alarme em 10 minutos</button>
+      <button class="chip">Motiva-me</button>
+      <button class="chip">Quem te criou?</button>
+    </div>
+    <div class="row"><input id="txt" placeholder="Escreva um comando..." autocomplete="off"><button class="btn" id="send">Enviar</button></div>
+  </section>
+
+  <section class="view" id="v-alarm">
+    <h1>Alarmes</h1>
+    <p class="sub">Defina qualquer hora, ou diga: “Cosmo, acorda-me às 7”</p>
+    <div class="card">
+      <input type="time" class="timeinp" id="atime" value="07:00">
+      <div class="row" style="margin-top:10px"><input id="alabel" placeholder="Nome do alarme (opcional)"></div>
+      <div class="row" style="margin-top:10px;align-items:center;justify-content:space-between">
+        <span style="font-size:13px;color:var(--mut)">Repetir todos os dias</span>
+        <label class="sw"><input type="checkbox" id="arep"><span></span></label>
+      </div>
+      <button class="btn" id="aadd" style="width:100%;margin-top:14px">Adicionar alarme</button>
+    </div>
+    <div class="card" id="alist-card"><h3>Os meus alarmes</h3><div id="alist"></div></div>
+    <p class="note">Para tocar à hora certa, o Cosmo deve estar aberto (pode bloquear o ecrã com o app aberto, mantemos o ecrã ativo enquanto houver alarmes).</p>
+  </section>
+
+  <footer>Criado pela <b>ANDALA</b> · Equipa de Desenvolvimento</footer>
+</main>
+
+<nav>
+  <button class="on" data-v="v-home"><b>✦</b>Assistente</button>
+  <button data-v="v-alarm"><b>⏰</b>Alarmes</button>
+</nav>
+
+<dialog id="dlg">
+  <h3 style="margin-bottom:4px">Definições</h3>
+  <label>Nome do utilizador</label>
+  <input type="text" id="cfgname" placeholder="Isaías">
+  <label style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;font-size:14px;color:var(--txt)">
+    Ativar com a palavra “Cosmo”
+    <span class="sw"><input type="checkbox" id="cfgwake"><span></span></span>
+  </label>
+  <p class="note" style="margin-top:4px">Com isto ligado, o Cosmo fica a ouvir enquanto o app estiver aberto. Diga “Cosmo” e ele responde.</p>
+  <label>Chave de API (opcional, respostas mais inteligentes)</label>
+  <input type="password" id="cfgkey" placeholder="Cole a chave aqui">
+  <p class="note" style="margin-top:4px">Fica guardada apenas neste aparelho.</p>
+  <div class="row" style="margin-top:16px"><button class="btn" id="save" style="flex:1">Guardar</button><button class="btn alt" id="close">Fechar</button></div>
+</dialog>
+
+<div id="ring">
+  <div style="font-size:54px">⏰</div>
+  <div class="big" id="rtime">07:00</div>
+  <div id="rlabel" style="font-size:18px"></div>
+  <button class="btn" id="rstop">Parar alarme</button>
+</div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const store = {
+  get(k, d){ try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+};
+let cfg = Object.assign({ name: "Isaías", key: "", wake: false }, store.get("cosmo_cfg", {}));
+let alarms = store.get("cosmo_alarms", []);
+const orb = $("orb"), logEl = $("log"), statusEl = $("status"), pill = $("pill");
+const N = () => cfg.name || "Isaías";
+const rnd = a => a[Math.floor(Math.random() * a.length)];
+const pad = n => String(n).padStart(2, "0");
+
+/* ---------- visual ---------- */
+for (let i = 0; i < 35; i++) {
+  const s = document.createElement("div"); s.className = "star";
+  s.style.cssText = `top:${Math.random()*100}%;left:${Math.random()*100}%;animation-delay:${Math.random()*4}s`;
+  document.body.appendChild(s);
+}
+function confetti() {
+  const cols = ["#ff5fa2", "#ffd166", "#22d3ee", "#7c5cff", "#fff"];
+  for (let i = 0; i < 36; i++) {
+    const c = document.createElement("div"); c.className = "confetti";
+    c.style.left = Math.random() * 100 + "vw"; c.style.background = cols[i % cols.length];
+    c.style.animationDelay = Math.random() * .8 + "s";
+    document.body.appendChild(c); setTimeout(() => c.remove(), 3600);
+  }
+}
+function setStatus(t, live) { statusEl.textContent = t; pill.classList.toggle("live", !!live); }
+function add(text, who) {
+  const d = document.createElement("div"); d.className = "m " + who; d.textContent = text;
+  logEl.appendChild(d); logEl.scrollTop = logEl.scrollHeight;
+}
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x === b));
+  document.querySelectorAll(".view").forEach(v => v.classList.toggle("on", v.id === b.dataset.v));
+});
+function refreshHello() {
+  const h = new Date().getHours();
+  const sd = h < 12 ? "Bom dia" : h < 19 ? "Boa tarde" : "Boa noite";
+  $("hello").textContent = `${sd}, senhor ${N()}`;
+  return sd;
+}
+
+/* ---------- voz (saída) ---------- */
+const synth = window.speechSynthesis;
+let voice = null, speaking = false;
+function pickVoice() {
+  if (!synth) return;
+  const v = synth.getVoices();
+  voice = v.find(x => /pt-PT/i.test(x.lang)) || v.find(x => /^pt/i.test(x.lang)) || null;
+}
+if (synth) { pickVoice(); synth.onvoiceschanged = pickVoice; }
+function speak(t, done) {
+  if (!synth) { done && done(); return; }
+  synth.cancel();
+  const u = new SpeechSynthesisUtterance(t.replace(/[\u{1F300}-\u{1FAFF}☀-➿]/gu, ""));
+  u.lang = "pt-PT"; if (voice) u.voice = voice; u.pitch = 1.08;
+  u.onstart = () => { speaking = true; orb.classList.add("speak"); pauseRec(); };
+  const end = () => { speaking = false; orb.classList.remove("speak"); done && done(); resumeRec(); };
+  u.onend = end; u.onerror = end;
+  synth.speak(u);
+}
+function say(t, done) { add(t, "c"); speak(t, done); }
+
+/* ---------- alarmes ---------- */
+let audioCtx = null;
+function unlockAudio() {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+  } catch(e){}
+}
+document.addEventListener("click", unlockAudio);
+document.addEventListener("touchstart", unlockAudio, { passive: true });
+
+function beep() {
+  if (!audioCtx) return;
+  const t0 = audioCtx.currentTime;
+  [0, .22, .44].forEach(off => {
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = "sine"; o.frequency.value = 880;
+    g.gain.setValueAtTime(0, t0 + off);
+    g.gain.linearRampToValueAtTime(.4, t0 + off + .02);
+    g.gain.linearRampToValueAtTime(0, t0 + off + .18);
+    o.connect(g).connect(audioCtx.destination); o.start(t0 + off); o.stop(t0 + off + .2);
+  });
+}
+let ringTimer = null, ringing = null;
+function startRing(a) {
+  ringing = a;
+  $("rtime").textContent = a.time;
+  $("rlabel").textContent = a.label || `Está na hora, senhor ${N()}!`;
+  $("ring").classList.add("on");
+  confetti();
+  const cycle = () => {
+    beep(); if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 300]);
+  };
+  cycle(); ringTimer = setInterval(cycle, 2200);
+  let n = 0;
+  const talk = () => { if (ringing && n++ < 20) speakOverBeep(`Senhor ${N()}, está na hora! ${a.label || ""}`); };
+  setTimeout(talk, 1800);
+  ringing.talkTimer = setInterval(talk, 9000);
+  try {
+    if (document.hidden && "Notification" in window && Notification.permission === "granted")
+      new Notification("Cosmo · Alarme", { body: a.label || `Está na hora, senhor ${N()}!`, icon: "icon-192.png", requireInteraction: true });
+  } catch(e){}
+}
+function speakOverBeep(t) {
+  if (!synth) return;
+  synth.cancel();
+  const u = new SpeechSynthesisUtterance(t); u.lang = "pt-PT"; if (voice) u.voice = voice;
+  synth.speak(u);
+}
+function stopRing() {
+  clearInterval(ringTimer);
+  if (ringing) clearInterval(ringing.talkTimer);
+  ringing = null; synth && synth.cancel(); if (navigator.vibrate) navigator.vibrate(0);
+  $("ring").classList.remove("on");
+  say(`Alarme desligado. Tenha um excelente dia, senhor ${N()}!`);
+}
+$("rstop").onclick = stopRing;
+
+function saveAlarms() { store.set("cosmo_alarms", alarms.map(({ id, time, label, repeat, on, last }) => ({ id, time, label, repeat, on, last }))); updateWake(); }
+function renderAlarms() {
+  const box = $("alist"); box.innerHTML = "";
+  if (!alarms.length) { box.innerHTML = '<p class="note" style="margin:0">Ainda não há alarmes.</p>'; return; }
+  alarms.slice().sort((a, b) => a.time.localeCompare(b.time)).forEach(a => {
+    const r = document.createElement("div"); r.className = "al";
+    r.innerHTML = `<div><div class="t">${a.time}</div><div class="l">${a.label ? a.label + " · " : ""}${a.repeat ? "Todos os dias" : "Uma vez"}</div></div><div class="sp"></div>
+      <label class="sw"><input type="checkbox" ${a.on ? "checked" : ""}><span></span></label><button class="x" aria-label="Apagar">✕</button>`;
+    r.querySelector("input").onchange = e => { a.on = e.target.checked; saveAlarms(); };
+    r.querySelector(".x").onclick = () => { alarms = alarms.filter(z => z.id !== a.id); saveAlarms(); renderAlarms(); };
+    box.appendChild(r);
+  });
+}
+function addAlarm(time, label, repeat) {
+  const a = { id: Date.now() + Math.random(), time, label: label || "", repeat: !!repeat, on: true, last: "" };
+  alarms.push(a); saveAlarms(); renderAlarms();
+  if ("Notification" in window && Notification.permission === "default") Notification.requestPermission();
+  return a;
+}
+$("aadd").onclick = () => {
+  const t = $("atime").value; if (!t) return;
+  addAlarm(t, $("alabel").value.trim(), $("arep").checked); $("alabel").value = "";
+  say(`Alarme definido para as ${t}, senhor ${N()}.`);
+};
+setInterval(() => {
+  const d = new Date(), hm = `${pad(d.getHours())}:${pad(d.getMinutes())}`, key = d.toDateString() + hm;
+  if (ringing) return;
+  for (const a of alarms) {
+    if (a.on && a.time === hm && a.last !== key) {
+      a.last = key; if (!a.repeat) a.on = false;
+      saveAlarms(); renderAlarms(); startRing(a); break;
+    }
+  }
+}, 1000);
+
+/* wake lock: mantém o ecrã ligado enquanto houver alarmes ou escuta */
+let wl = null;
+async function updateWake() {
+  const need = alarms.some(a => a.on) || cfg.wake;
+  try {
+    if (need && !wl && "wakeLock" in navigator) { wl = await navigator.wakeLock.request("screen"); wl.addEventListener("release", () => wl = null); }
+    else if (!need && wl) { await wl.release(); wl = null; }
+  } catch(e){}
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden) updateWake(); });
+
+/* ---------- interpretar alarmes por voz ---------- */
+function parseAlarm(s) {
+  if (/(cancel|apag|remov|elimin)\w*.*alarme/.test(s)) {
+    const n = alarms.length; alarms = []; saveAlarms(); renderAlarms();
+    return n ? `Feito, senhor ${N()}. Apaguei ${n} alarme${n > 1 ? "s" : ""}.` : "Não havia alarmes para apagar.";
+  }
+  if (/(que|quais|quantos).*alarmes|lista.*alarmes/.test(s)) {
+    const on = alarms.filter(a => a.on);
+    return on.length ? `Tem ${on.length} alarme${on.length > 1 ? "s" : ""}: ${on.map(a => a.time).join(", ")}.` : "Não tem nenhum alarme ativo.";
+  }
+  if (!/(alarme|acorda|desperta|despert|avisa|lembra)/.test(s)) return null;
+  const rep = /(todos os dias|todo dia|diariamente|sempre)/.test(s);
+  let m = s.match(/\bem\s+(\d+|um|uma|meia)\s*(minutos?|horas?|hora)/);
+  if (m) {
+    const v = m[1] === "um" || m[1] === "uma" ? 1 : m[1] === "meia" ? .5 : parseInt(m[1]);
+    const mins = /hora/.test(m[2]) ? Math.round(v * 60) : v;
+    const d = new Date(Date.now() + mins * 60000), t = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    addAlarm(t, "", false);
+    return `Combinado, senhor ${N()}! Tocarei daqui a ${mins} minutos, às ${t}.`;
+  }
+  m = s.match(/(?:^|\s)(?:às?|as)\s+(\d{1,2})(?:\s*(?:h|horas?|:)?\s*(?:e\s*)?(\d{1,2}|meia|um quarto)?)?/);
+  if (!m) m = s.match(/\b(\d{1,2})\s*(?:h|horas?|:)\s*(?:e\s*)?(\d{1,2}|meia|um quarto)?/);
+  if (!m) return `Diga a hora, senhor ${N()}. Por exemplo: acorda-me às 6 e 30.`;
+  let h = parseInt(m[1]), min = 0;
+  if (m[2]) min = m[2] === "meia" ? 30 : m[2] === "um quarto" ? 15 : parseInt(m[2]);
+  if (/(tarde|noite)/.test(s) && h < 12) h += 12;
+  if (/(da manhã|de manhã|madrugada)/.test(s) && h === 12) h = 0;
+  if (h > 23 || min > 59) return "Essa hora não me parece válida, senhor " + N() + ".";
+  const t = `${pad(h)}:${pad(min)}`;
+  addAlarm(t, "", rep);
+  return `Sim senhor ${N()}! Alarme definido para as ${t}${rep ? ", todos os dias" : ""}.`;
+}
+
+/* ---------- inteligência ---------- */
+const piadas = ["Porque é que o computador foi ao médico? Porque tinha um vírus!", "O que o zero disse ao oito? Que cinto bonito!", "Porque é que o livro de matemática estava triste? Porque tinha muitos problemas."];
+const motiva = () => [
+  `Senhor ${N()}, grandes coisas começam com pequenos passos. O senhor está no caminho certo!`,
+  `Lembre-se, senhor ${N()}: quem estuda hoje, comanda amanhã.`,
+  `O senhor tem talento de sobra, senhor ${N()}. Continue firme!`
+];
+function local(q) {
+  const s = q.toLowerCase().replace(/[?!.,]/g, " ");
+  const al = parseAlarm(s); if (al) return al;
+  const now = new Date();
+  if (/\bhoras?\b/.test(s) && !/alarme/.test(s)) return `Sim senhor ${N()}! São ${now.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" })}.`;
+  if (/(data|dia de hoje|que dia)/.test(s)) return `Hoje é ${now.toLocaleDateString("pt-PT", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}, senhor ${N()}.`;
+  if (/(piada|engraçad)/.test(s)) return rnd(piadas) + " Haha!";
+  if (/(motiv|anim|força|desanim)/.test(s)) { confetti(); return rnd(motiva()); }
+  if (/(criou|criador|andala|quem fez|desenvolv)/.test(s)) return `Fui criado pela ANDALA, uma equipa de desenvolvimento dedicada a criar tecnologia útil. Muito prazer em servir, senhor ${N()}!`;
+  if (/(quem sou|meu nome|me chamo)/.test(s)) return `O senhor é ${N()}, uma pessoa muito especial e importante para mim!`;
+  if (/(teu nome|seu nome|quem és|quem é você|como te chamas)/.test(s)) return `Eu sou o Cosmo, assistente de voz da ANDALA, ao serviço do senhor ${N()}!`;
+  if (/(olá|\boi\b|bom dia|boa tarde|boa noite|\bhey\b)/.test(s)) { confetti(); return `Olá, senhor ${N()}! É uma honra falar consigo. Como posso ajudar?`; }
+  if (/obrigad/.test(s)) return `Foi um prazer, senhor ${N()}!`;
+  if (/(quanto é|calcul)/.test(s)) {
+    const m = s.replace(/\bx\b|vezes/g, "*").replace(/mais/g, "+").replace(/menos/g, "-").replace(/dividido por/g, "/").match(/\d+(?:\s*[+\-*/]\s*\d+)+/);
+    if (m) { try { const r = Function('"use strict";return(' + m[0] + ")")(); if (isFinite(r)) return `O resultado é ${r}, senhor ${N()}!`; } catch(e){} }
+  }
+  return null;
+}
+async function remote(q) {
+  if (!cfg.key) return null;
+  try {
+    const r = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + encodeURIComponent(cfg.key), {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: `Tu és o Cosmo, assistente de voz criado pela ANDALA. Falas português de forma simpática e curta (máximo 3 frases). Trata sempre o utilizador por "senhor ${N()}", faz com que ele se sinta importante e respeitado. Linguagem adequada para menores.` }] },
+        contents: [{ role: "user", parts: [{ text: q }] }]
+      })
+    });
+    const j = await r.json();
+    return j.candidates?.[0]?.content?.parts?.[0]?.text || null;
+  } catch(e) { return null; }
+}
+async function handle(q) {
+  q = (q || "").trim(); if (!q) return;
+  add(q, "u"); setStatus("A pensar...", true);
+  let a = local(q);
+  if (!a) a = await remote(q);
+  if (!a) a = `${rnd([`Sim senhor ${N()}!`, `Às suas ordens, senhor ${N()}!`])} Ainda estou a aprender essa, mas posso definir alarmes, dizer as horas, contar piadas ou motivá-lo.`;
+  setStatus(cfg.wake ? "À escuta de “Cosmo”" : "Pronto", cfg.wake);
+  say(a);
+}
+
+/* ---------- voz (entrada) + palavra de ativação ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, mode = "off", awaiting = false, awaitT = null, paused = false;
+function buildRec(continuous) {
+  const r = new SR(); r.lang = "pt-PT"; r.continuous = continuous; r.interimResults = false;
+  r.onstart = () => { if (mode === "once") { orb.classList.add("listen"); setStatus("A ouvir...", true); } };
+  r.onresult = e => {
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (!e.results[i].isFinal) continue;
+      const text = e.results[i][0].transcript.trim(), low = text.toLowerCase();
+      if (mode === "once") { handle(text); return; }
+      if (/cosm/.test(low)) {
+        const rest = text.replace(/^.*?cosm\w*[\s,.:;-]*/i, "").trim();
+        confetti();
+        if (rest.length > 2) handle(rest);
+        else { awaiting = true; clearTimeout(awaitT); awaitT = setTimeout(() => awaiting = false, 10000); orb.classList.add("listen"); say(`Sim, senhor ${N()}?`); }
+      } else if (awaiting) { awaiting = false; orb.classList.remove("listen"); handle(text); }
+    }
+  };
+  r.onerror = e => {
+    if (e.error === "not-allowed" || e.error === "service-not-allowed") {
+      cfg.wake = false; store.set("cosmo_cfg", cfg); mode = "off"; setStatus("Microfone bloqueado", false);
+      add("Preciso de permissão para usar o microfone, senhor " + N() + ". Ative-a nas definições do navegador.", "c");
+    }
+  };
+  r.onend = () => {
+    orb.classList.remove("listen");
+    if (mode === "once") { mode = cfg.wake ? "wake" : "off"; setStatus(cfg.wake ? "À escuta de “Cosmo”" : "Pronto", cfg.wake); }
+    if (cfg.wake && !speaking && !paused && !ringing) setTimeout(startWake, 350);
+  };
+  return r;
+}
+function startWake() {
+  if (!SR || !cfg.wake || speaking) return;
+  try { if (rec) { rec.onend = null; rec.abort(); } } catch(e){}
+  mode = "wake"; rec = buildRec(true);
+  try { rec.start(); setStatus("À escuta de “Cosmo”", true); } catch(e){}
+}
+function pauseRec() { paused = true; try { rec && rec.abort(); } catch(e){} }
+function resumeRec() { paused = false; if (cfg.wake) setTimeout(startWake, 400); }
+$("mic").onclick = () => {
+  unlockAudio();
+  if (!SR) { say("O reconhecimento de voz não está disponível neste navegador. Use o Chrome, senhor " + N() + ", ou escreva o comando."); return; }
+  synth && synth.cancel();
+  try { rec && (rec.onend = null, rec.abort()); } catch(e){}
+  mode = "once"; rec = buildRec(false);
+  rec.onend = () => { orb.classList.remove("listen"); mode = cfg.wake ? "wake" : "off"; setStatus(cfg.wake ? "À escuta de “Cosmo”" : "Pronto", cfg.wake); if (cfg.wake) setTimeout(startWake, 400); };
+  try { rec.start(); } catch(e){}
+};
+$("send").onclick = () => { unlockAudio(); handle($("txt").value); $("txt").value = ""; };
+$("txt").onkeydown = e => { if (e.key === "Enter") $("send").click(); };
+document.querySelectorAll(".chip").forEach(c => c.onclick = () => { unlockAudio(); handle(c.textContent); });
+
+/* ---------- definições ---------- */
+$("gear").onclick = () => { $("cfgname").value = cfg.name; $("cfgkey").value = cfg.key; $("cfgwake").checked = cfg.wake; $("dlg").showModal(); };
+$("close").onclick = () => $("dlg").close();
+$("save").onclick = () => {
+  cfg.name = $("cfgname").value.trim() || "Isaías"; cfg.key = $("cfgkey").value.trim(); cfg.wake = $("cfgwake").checked;
+  store.set("cosmo_cfg", cfg); $("dlg").close(); refreshHello(); updateWake();
+  if (cfg.wake) { if (!SR) { cfg.wake = false; say("Este navegador não suporta escuta por voz. Use o Chrome."); } else startWake(); }
+  else { mode = "off"; try { rec && (rec.onend = null, rec.abort()); } catch(e){} setStatus("Pronto", false); }
+  say(`Definições guardadas, senhor ${N()}!`);
+};
+
+/* ---------- arranque ---------- */
+const sd = refreshHello();
+renderAlarms(); updateWake();
+add(`${sd}, senhor ${N()}! Eu sou o Cosmo, criado pela ANDALA. É um prazer enorme conhecê-lo!`, "c");
+document.body.addEventListener("click", function once() {
+  speak(`${sd}, senhor ${N()}! Eu sou o Cosmo, criado pela ANDALA. É um prazer conhecê-lo!`);
+  confetti(); if (cfg.wake) startWake();
+  document.body.removeEventListener("click", once);
+}, { once: true });
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+<div id="lock"><div style="font-size:46px">🔒</div><h2 id="lt">Cosmo</h2><p id="lm"></p>
+<input type="password" id="p1" inputmode="numeric" autocomplete="off" placeholder="Senha"><input type="password" id="p2" inputmode="numeric" autocomplete="off" placeholder="Repita a senha" style="display:none">
+<button class="btn" id="lb">Entrar</button></div>
+<script>
+(function(){
+const K="cosmo_pw",S="andala-cosmo",$=i=>document.getElementById(i);
+function hs(s){s=S+s;let a=0xdeadbeef,b=0x41c6ce57;for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);a=Math.imul(a^c,2654435761);b=Math.imul(b^c,1597334677)}
+ a=Math.imul(a^(a>>>16),2246822507)^Math.imul(b^(b>>>13),3266489909);b=Math.imul(b^(b>>>16),2246822507)^Math.imul(a^(a>>>13),3266489909);return (4294967296*(2097151&b)+(a>>>0)).toString(16)}
+let saved=null;try{saved=localStorage.getItem(K)}catch(e){}
+const setup=!saved;
+$("lt").textContent=setup?"Crie a sua senha":"Cosmo";$("lm").textContent=setup?"Será pedida sempre que abrir o app":"Introduza a senha";
+$("lb").textContent=setup?"Guardar senha":"Entrar";$("p2").style.display=setup?"":"none";
+function go(){const a=$("p1").value;
+ if(setup){ if(a.length<4){$("lm").textContent="Mínimo 4 caracteres";return}
+  if(a!==$("p2").value){$("lm").textContent="As senhas não coincidem";return}
+  try{localStorage.setItem(K,hs(a))}catch(e){} $("lock").classList.add("off");
+ }else{ if(hs(a)===saved){$("lock").classList.add("off")}else{$("lm").textContent="Senha incorreta";$("p1").value=""} }}
+$("lb").onclick=go;[$("p1"),$("p2")].forEach(i=>i.addEventListener("keydown",e=>{if(e.key==="Enter")go()}));
+})();
+</script>
+</body>
+</html>
